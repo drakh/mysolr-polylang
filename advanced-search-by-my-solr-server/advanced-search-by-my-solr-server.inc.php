@@ -225,7 +225,20 @@ function mss_build_document( $options, $post_info ) {
 		$doc->setField( 'modified', mss_format_date($post_info->post_modified_gmt) );
 		$doc->setField( 'displaydate', $post_info->post_date );
 		$doc->setField( 'displaymodified', $post_info->post_modified );
-
+		//check if polylang is installed and active
+		$plgs=get_plugins();
+		foreach($plgs as $key => $val)
+		{
+			if($val['Name']=='Polylang')
+			{
+				if(is_plugin_active($key))//Polylang is active lets use language field
+				{
+					global $polylang;//without this it wont work
+					$lang=$polylang->get_post_language($post_info->ID)->slug;//we have the language slug
+					$doc->setField( 'lang', $lang );//store the language slug into the document
+				}
+			}
+		}
 		$categories = get_the_category($post_info->ID);
 		if ( ! $categories == NULL ) {
 			foreach( $categories as $category ) {
